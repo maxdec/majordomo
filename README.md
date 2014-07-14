@@ -1,0 +1,4 @@
+majordomo
+=========
+
+Slack Bot
