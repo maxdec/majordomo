@@ -28,8 +28,8 @@ app.get('/', function (req, res) {
  * timestamp=1355517523.000005
  * user_id=U2147483697
  * user_name=Steve
- * text=googlebot: What is the air-speed velocity of an unladen swallow?
- * trigger_word=googlebot:
+ * command=/weather
+ * text=94070
  *
  * Response must be a JSON:
  *   {
@@ -107,8 +107,8 @@ function securityChecker(req, res, next) {
  * timestamp=1355517523.000005
  * user_id=U2147483697
  * user_name=Steve
- * text=googlebot: What is the air-speed velocity of an unladen swallow?
- * trigger_word=googlebot:
+ * command=/weather
+ * text=94070
  */
 function parametizer(req, res, next) {
   req.user = {
@@ -121,7 +121,7 @@ function parametizer(req, res, next) {
     name: req.body.channel_name
   };
 
-  var words = req.body.text.replace(req.body.trigger_word, '').trim().split(' ');
+  var words = req.body.text.split(' ');
   req.action = {
     name: words[0],
     params: words.slice(1)
