@@ -59,7 +59,7 @@ actions.gifme = function (req, res) {
     if (err) return res.send(err);
     var b = JSON.parse(body);
     var random = getRandomInt(0, b.data.length - 1);
-    res.send({ text: b.data[random].url });
+    res.send(b.data[random].url);
   });
 };
 
@@ -67,14 +67,14 @@ actions.gifme = function (req, res) {
  * Where to go for lunch?
  */
 actions.lunch = function (req, res) {
-  res.send({ text: restaurants[getRandomInt(0, restaurants.length - 1)] });
+  res.send(restaurants[getRandomInt(0, restaurants.length - 1)]);
 };
 
 /**
  * What's playing on the jukebox
  */
 actions.jukebox = function (req, res) {
-  res.send({ text: 'Nicolas Jaar - Mi Mujer' });
+  res.send('Nicolas Jaar - Mi Mujer');
 };
 
 /**
@@ -84,7 +84,7 @@ actions.help = function (req, res) {
   var help = '' +
     '/majordomo gifme keyword\nreturns a gif with the keyword\n\n' +
     '/majordomo lunch\nreturns a place to eat';
-  res.send({ text: help });
+  res.send(help);
 };
 
 /**
