@@ -5,6 +5,12 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var app = express();
 var router = express.Router();
+var Geocoder = require('geocoder');
+var Forecast = require('forecast.io');
+var forecast = new Forecast({
+  APIKey: process.env.FORECAST_API_KEY,
+  timeout: 1000
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,6 +44,7 @@ app.get('/', function (req, res) {
  */
 app.post('/', securityChecker,
               parametizer,
+              geocoder,
               dispatcher);
 
 app.use(router);
@@ -75,6 +82,18 @@ actions.lunch = function (req, res) {
  */
 actions.jukebox = function (req, res) {
   res.send('Nicolas Jaar - Mi Mujer');
+};
+
+/**
+ * Get the current weather
+ */
+actions.weather = function (req, res) {
+  forecast.get(req.location.lat, req.location.lng, function (err, _, data) {
+    if (err) return res.send(500);
+    var currently = data.currently;
+    var tempC = (currently.temperature - 32) * 5 / 9;
+    res.send(req.location.name + ': ' + currently.summary + ' (' + tempC.toFixed(2) + '°C)');
+  });
 };
 
 /**
@@ -136,4 +155,22 @@ function parametizer(req, res, next) {
 function dispatcher(req, res, next) {
   if (!actions[req.action.name]) return res.send(404);
   actions[req.action.name](req, res, next);
+}
+
+function geocoder(req, res, next) {
+  if (req.action.name !== 'weather') return next();
+  var city = req.action.params.join(' ');
+
+  if (!city) {
+    // Office location
+    req.location = { lat: 52.473673, lng: 13.423589, name: 'Berlin' };
+    return next();
+  }
+
+  Geocoder.geocode(city, function (err, data) {
+    if (err) return res.send(500);
+    req.location = data.results[0].geometry.location;
+    req.location.name = city;
+    next();
+  });
 }
